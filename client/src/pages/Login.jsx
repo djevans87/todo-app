@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { getLoggedIn } from "../controller/api";
+import { getLoggedIn } from "../controller/user";
 
 const Login = () => {
   const navigate = useNavigate();

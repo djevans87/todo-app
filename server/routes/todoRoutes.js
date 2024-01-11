@@ -9,17 +9,16 @@ const getTodosCollection = () => {
   return collection;
 };
 
-
-// GET /todos
+// GET ALL /todos 
 router.get("/:username/todos", async (req, res) => {
- const { username } = req.params;
- const collection = getTodosCollection();
+  const { username } = req.params;
+  const collection = getTodosCollection();
   const todos = await collection.find({ username }).toArray();
 
   res.status(200).json(todos);
 });
 
-// POST /todos
+// POST /todos Create new Todo
 router.post("/:username/todos", async (req, res) => {
   const { username } = req.params;
   const collection = getTodosCollection(username);
@@ -28,12 +27,16 @@ router.post("/:username/todos", async (req, res) => {
   if (!todo) {
     return res.status(400).json({ mssg: "error todo not created" });
   }
-  try{
-  const newTodo = await collection.insertOne({ username, todo: todo, status: false });
-  res.status(201).json({ todo, status: false, _id: newTodo.insertedId });
+  try {
+    const newTodo = await collection.insertOne({
+      username,
+      todo: todo,
+      status: false,
+    });
+    res.status(201).json({ todo, status: false, _id: newTodo.insertedId, message: "Yeah its working" });
   } catch (error) {
     console.error("Error inserting new todo:", error);
-    res.status(500).json({ error: "Failed to insert new todo" }); 
+    res.status(500).json({ error: "Failed to insert new todo" });
   }
 });
 
@@ -42,15 +45,32 @@ router.delete("/:username/todos/:id", async (req, res) => {
   const { username, id } = req.params;
   const collection = getTodosCollection();
   const _id = new ObjectId(id);
-  const deletedTodo = await collection.deleteOne({username, _id });
+  const deletedTodo = await collection.deleteOne({ username, _id });
 
   res.status(200).json(deletedTodo);
+});
+
+// DELETE /todos/:username delete all
+router.delete("/:username/todos", async (req, res) => {
+  const { username } = req.params;
+  const collection = getTodosCollection();
+
+  try {
+    const result = await collection.deleteMany({ username });
+    res.status(200).json({
+      message: `Deleted ${result.deletedCount} todos for ${username}`,
+    });
+  } catch (error) {
+    console.error("Error deleting todos:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 // PUT /todos/:id
 router.put("/:username/todos/:id", async (req, res) => {
   const { username, id } = req.params;
   const collection = getTodosCollection();
+  console.log("Received params:", req.params);
   const _id = new ObjectId(id);
   const todo = await collection.findOne({ username, _id });
 
