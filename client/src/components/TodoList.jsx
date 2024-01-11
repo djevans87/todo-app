@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { createTodo, deleteTodo, getTodos, toggleTodo } from "./api";
+import { createTodo, deleteTodo, getTodos, toggleTodo } from "../controller/api";
 import TodoItem from "./TodoItem";
 import { Button } from "@mui/material";
 
@@ -62,7 +62,7 @@ const TodoList = () => {
 
   return (
     <main className="container">
-      <h1 className="title">Todo List</h1>
+      <h1 className="sub-heading">Things ToDo</h1>
 
       <form className="form" onSubmit={handleSubmit}>
         <input
