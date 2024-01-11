@@ -41,6 +41,20 @@ const TodoList = () => {
     }
   };
 
+  const toggleCompleted = async (id) => {
+    try {
+      await toggleTodo(username,id);
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo._id === id ? { ...todo, status: !todo.status } : todo
+        )
+      );
+    } catch (error) {
+      console.error("Error toggling completed status:", error);
+    }
+  };
+
+
   const handleDelete = async (id) => {
     try {
       await deleteTodo(username,id);
@@ -61,25 +75,20 @@ const TodoList = () => {
     }
   };
 
-  const toggleCompleted = async (id) => {
-    try {
-      await toggleTodo(username,id);
-      setTodos((prevTodos) =>
-        prevTodos.map((todo) =>
-          todo._id === id ? { ...todo, status: !todo.status } : todo
-        )
-      );
-    } catch (error) {
-      console.error("Error toggling completed status:", error);
-    }
-  };
-useEffect(() => {
-  const unloadHandler = async () => {
+  //Deletes all guest Todos to clear space in DB
+  const unloadHandler = async (event) => {
+    event.preventDefault();
+  
     if (username === "guest") {
       await handleDeleteAll();
+      // Allow the page to unload after deletion is complete
+      window.removeEventListener("beforeunload", unloadHandler);
+      window.close(); // Close the window or take other appropriate action
     }
-  };
-  window.addEventListener('beforeunload', unloadHandler);
+  }; 
+
+useEffect(() => {
+   window.addEventListener('beforeunload', unloadHandler);
 
   return () => {
     window.removeEventListener('beforeunload', unloadHandler);

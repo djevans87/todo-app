@@ -1,5 +1,8 @@
 require("dotenv").config();
 const { connectToMongoDB } = require("./database");
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const express = require("express");
 
