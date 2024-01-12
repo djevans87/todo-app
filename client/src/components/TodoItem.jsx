@@ -25,10 +25,9 @@ const TodoItem = ({ todo, onDelete, onToggleCompleted }) => {
         <Button
           className="todo__delete"
           onClick={() => onDelete(todo._id)}
-          startIcon={<DeleteIcon />}
           variant="contained"
         >
-          Delete
+          <DeleteIcon />
         </Button>
       </div>
     </div>
