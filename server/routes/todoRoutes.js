@@ -33,7 +33,7 @@ router.post("/:username/todos", async (req, res) => {
       todo: todo,
       status: false,
     });
-    res.status(201).json({ todo, status: false, _id: newTodo.insertedId, message: "Yeah its working" });
+    res.status(201).json({ todo, status: false, _id: newTodo.insertedId});
   } catch (error) {
     console.error("Error inserting new todo:", error);
     res.status(500).json({ error: "Failed to insert new todo" });
