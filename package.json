@@ -2,8 +2,9 @@
   "name": "todo-list-app",
   "version": "1.0.0",
   "scripts": {
-    "build": "cd client && npm run build && cd ../server && npm install",
-    "start": "npm run build && cd server && npm start"
+    "build": "cd server && npm install --production",
+    "start": "cd server && npm start",
+    "heroku-postbuild": "cd server && npm install --production"
   },
   "dependencies": {},
   "engines": {
