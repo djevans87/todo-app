@@ -93,7 +93,7 @@ useEffect(() => {
   return () => {
     window.removeEventListener('beforeunload', unloadHandler);
   };
-}, [handleDeleteAll, username])
+})
  
   return (
     <main className="container">
