@@ -7,7 +7,7 @@ const headers = {
 };
 
 const setAllowAccess = (access, username) => {
-  const [, changeName, allowAccess] = useStore.getState();
+  const { changeName, allowAccess } = useStore.getState();
   changeName(username);
   allowAccess(access);
 };
@@ -28,7 +28,15 @@ export const getRegistered = async (username, email, password, navigate) => {
         navigate("/login");
       }, 2000);
     } else {
-      toast.error(data.error || "Registration failed");
+      if (data.error.includes("username")) {
+        toast.error(
+          "Username is already in use. Please choose a different one."
+        );
+      } else if (data.error.includes("email")) {
+        toast.error("Email is already in use. Please choose a different one.");
+      } else {
+        toast.error(data.error || "Registration failed");
+      }
     }
   } catch (error) {
     console.error("Error during registration:", error);
@@ -47,16 +55,22 @@ export const getLoggedIn = async (username, password, navigate) => {
     const data = await response.json();
 
     if (data.error) {
-      throw Error(data.error);
+      if (data.field === "username") {
+        toast.error("Invalid username, please try again.");
+      } else if (data.field === "password") {
+        toast.error("Invalid password, please try again.");
+      } else {
+        toast.error(data.error);
+      }
+    } else {
+      setAllowAccess(true, username);
+      toast.success("Login successful");
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
     }
-    setAllowAccess(true, username);
-
-    toast.success("Login successful");
-
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 2000);
   } catch (error) {
-    toast.error(error.message);
+    toast.error("Error during login, please try again.");
   }
 };

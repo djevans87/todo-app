@@ -1,10 +1,8 @@
 const express = require("express");
 const { getConnectedClient } = require("../database");
 const router = express.Router();
-
-
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { generateAuthToken } = require("../middlewares/userAuth");
 
 const getUserCollection = () => {
   const client = getConnectedClient();
@@ -25,12 +23,25 @@ router.post("/register", async (req, res) => {
         error: "Please provide a username, email, and password.",
       });
     }
+
     if (password.length < 8) {
-      return res.json({
+      return res.status(401).json({
         error: "password must be at least 8 characters long",
       });
     }
+    const userCollection = getUserCollection();
 
+    const existingUser = await userCollection.findOne({
+      $or: [{ username: username }, { email: email }],
+    });
+
+    if (existingUser) {
+      const duplicateField =
+        existingUser.username === username ? "username" : "email";
+      return  res.status(401).json({
+        error: `${duplicateField} is already in use. Please choose a different one.`,
+      });
+    }
     let hashedPassword;
     try {
       hashedPassword = await bcrypt.hash(password, 10);
@@ -41,7 +52,6 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    const userCollection = getUserCollection();
     const user = await userCollection.insertOne({
       username,
       email,
@@ -68,23 +78,35 @@ router.post("/login", async (req, res) => {
         .send({ message: "Both username and password are required." });
     }
 
-    const user = await User.findOne({ username });
+    const usersCollection = getUserCollection();
+    const user = await usersCollection.findOne({ username });
 
     if (!user) {
+      client.close();
       return res
         .status(401)
-        .json({ error: "Invalid credentials, please try again." });
+        .json({
+          error: "Invalid credentials, please try again.",
+          field: "username",
+        });
     }
 
     const passwordMatches = await bcrypt.compare(password, user.password);
 
     if (!passwordMatches) {
+      client.close();
       return res
         .status(401)
-        .json({ error: "Invalid credentials, please try again." });
+        .json({
+          error: "Invalid credentials, please try again.",
+          field: "password",
+        });
     }
 
-    const token = generateAuthToken(user.userId);
+    const token = jwt.sign({ userId: user.userId }, JWT_SECRET_KEY, {
+      expiresIn: "1h", // Set an expiration time for the token
+    });
+    client.close();
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -98,9 +120,9 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// router.get('/logout', (req, res) => {
-//   res.clearCookie("token");
-//   res.status(200).send();
-// });
+router.get("/logout", (req, res) => {
+  res.clearCookie("token");
+  res.status(200).send();
+});
 
 module.exports = router;

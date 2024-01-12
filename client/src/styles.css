@@ -416,3 +416,17 @@ body {
   top: 90px;
   left: 20px;
 }
+@media (max-width: 420px) {
+  .title {
+    font-size: 2.5rem;
+  }
+
+  .form {
+    width: 95%;
+  }
+
+  .todo {
+    width: 95%;
+    font-size: 1.2rem;
+  }
+ }

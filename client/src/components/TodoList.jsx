@@ -3,7 +3,7 @@ import { createTodo, deleteAllTodos, deleteTodo, getTodos, toggleTodo } from "..
 import TodoItem from "./TodoItem";
 import { Button } from "@mui/material";
 import { useStore } from "../store/store";
-import  { Delete, AddCircleRounded, RemoveCircleRounded } from "@mui/icons-material";
+import  { AddCircleRounded, RemoveCircleRounded } from "@mui/icons-material";
 
 const TodoList = () => {
   const [todos, setTodos] = useState([]);
@@ -13,7 +13,7 @@ const TodoList = () => {
   useEffect(() => {
     const fetchTodos = async () => {
       try {
-        const response = await getTodos();
+        const response = await getTodos(username);
         setTodos(Array.isArray(response) ? response : []);
       } catch (error) {
         console.error("Error fetching todos:", error);
@@ -21,7 +21,7 @@ const TodoList = () => {
     };
 
     fetchTodos();
-  }, []);
+  }, [username]);
 
   const handleAdd = async (text) => {
     try {

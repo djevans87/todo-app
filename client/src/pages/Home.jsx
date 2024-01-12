@@ -1,4 +1,5 @@
 import React from "react";
+import ToDoDashboard from "./ToDoDashboard";
 
 const Home = () => {
   return (
@@ -9,6 +10,11 @@ const Home = () => {
         😊
       </span>
       </h3>
+      <p>
+        You are currently able to add todos, but your list will not be saved.
+        You must login to use the saved list feature. If you do not have a login, please register.
+      </p>
+      <ToDoDashboard/>
     </div>
   );
 };
